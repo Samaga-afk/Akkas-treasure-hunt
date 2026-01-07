@@ -128,41 +128,12 @@ h2{margin-top:0}
 <div id="app"></div>
 
 <script>
-/* ===== AUDIO (ANDROID SAFE) ===== */
-const introMusic = new Audio("intro.mp3");
-const trialMusic = new Audio("trial.mp3");
-const finaleMusic = new Audio("finale.mp3");
+/* ===== SINGLE AUDIO ENGINE ===== */
+const music = new Audio();
+music.loop = true;
+music.volume = 0.6;
 
-introMusic.loop = true;
-trialMusic.loop = true;
-finaleMusic.loop = true;
-
-function stopAll(){
-  [introMusic,trialMusic,finaleMusic].forEach(m=>{
-    m.pause();
-    m.currentTime = 0;
-  });
-}
-
-function playIntro(){
-  stopAll();
-  introMusic.volume = 0.6;
-  introMusic.play();
-}
-
-function playTrial(){
-  stopAll();
-  trialMusic.volume = 0.6;
-  trialMusic.play();
-}
-
-function playFinale(){
-  stopAll();
-  finaleMusic.volume = 0.7;
-  finaleMusic.play();
-}
-
-/* ===== STORY ===== */
+/* ===== TRIAL DATA ===== */
 const trials=[
 {title:"The Whispering Hall",speaker:"The Castle",cls:"castle",answer:"hall",
 text:`Soft paws guard what words cannot say,
@@ -213,69 +184,74 @@ Holds what memory holds fast.`}
 
 let i=-1, danger=1;
 
-function render(h){ document.getElementById("app").innerHTML = h; }
+/* ===== RENDER ===== */
+function render(h){document.getElementById("app").innerHTML=h}
 
+/* ===== FLOW ===== */
 function intro(){
 render(`
 <div class="parchment">
-  <h2>The Six Trials of Chaitra</h2>
-  <p><em>The castle whispers your name…</em></p>
-  <button onclick="playIntro();instructions()">Begin</button>
+<h2>The Six Trials of Chaitra</h2>
+<p><em>The castle whispers your name…</em></p>
+<button onclick="startIntro()">Begin</button>
 </div>`);
+}
+
+function startIntro(){
+  music.src="intro.mp3";
+  music.play();
+  instructions();
 }
 
 function instructions(){
 render(`
 <div class="parchment">
-  <p>Lord Voldemort hunts your brother.
+<p>Lord Voldemort hunts your brother.
 Each truth you uncover weakens him.</p>
-  <button onclick="start()">I Understand</button>
+<button onclick="startTrials()">I Understand</button>
 </div>`);
 }
 
-function start(){
-  i=0;
-  danger=1;
-  playTrial();
+function startTrials(){
+  music.src="trial.mp3";
+  music.play();
+  i=0; danger=1;
   show();
 }
 
 function show(){
-const t=trials[i];
-danger++;
+const t=trials[i]; danger++;
 render(`
 <div class="stage">
-  <div class="hero"></div>
-  <div class="voldemort ${danger>2?'close':''}"></div>
-  <div class="parchment">
-    <span class="speaker ${t.cls}">${t.speaker}</span>
-    <h2>${t.title}</h2>
-    <p>${t.text}</p>
-    <input id="ans" placeholder="Speak the place…">
-    <br><br>
-    <button onclick="check()">Cast Spell</button>
-  </div>
-</div>`);
+<div class="hero"></div>
+<div class="voldemort ${danger>2?'close':''}"></div>
+<div class="parchment">
+<span class="speaker ${t.cls}">${t.speaker}</span>
+<h2>${t.title}</h2>
+<p>${t.text}</p>
+<input id="ans" placeholder="Speak the place…">
+<br><br>
+<button onclick="check()">Cast Spell</button>
+</div></div>`);
 }
 
 function check(){
 const v=document.getElementById("ans").value.toLowerCase().trim();
 if(v===trials[i].answer){
   danger=Math.max(1,danger-1);
-  i<trials.length-1 ? (i===2 ? mirror() : next()) : finale();
+  i<trials.length-1 ? (i===2?mirror():next()) : finale();
 }else{
-  danger++;
-  show();
+  danger++; show();
 }
 }
 
 function mirror(){
 render(`
 <div class="parchment">
-  <h2>The Mirror of Memory</h2>
-  <p>Not all magic is loud.
+<h2>The Mirror of Memory</h2>
+<p>Not all magic is loud.
 Some simply reminds us who we are.</p>
-  <button onclick="next()">Continue</button>
+<button onclick="next()">Continue</button>
 </div>`);
 }
 
@@ -284,9 +260,10 @@ function next(){ i++; show(); }
 function finale(){
 render(`
 <div class="parchment">
-  <span class="speaker dumbledore">Albus Dumbledore</span>
-  <h2>The End of the Hunt</h2>
-  <p>Voldemort falls —
+<span class="speaker dumbledore">Albus Dumbledore</span>
+<h2>The End of the Hunt</h2>
+<p>
+Voldemort falls —
 not to power,
 but to love he never understood.
 
@@ -295,16 +272,18 @@ Your brother is safe.
 Where warmth gathers,
 candles wait,
 and sweetness marks victory —
-your castle awaits.</p>
-  <button onclick="celebration()">Proceed</button>
+your castle awaits.
+</p>
+<button onclick="startFinale()">Cast the Final Spell</button>
 </div>`);
 }
 
-function celebration(){
-  playFinale();
+function startFinale(){
+  music.src="finale.mp3";
+  music.play();
   render(`
   <div class="parchment">
-    <h2>✨ The Castle Awaits ✨</h2>
+    <h2>The Trials Are Complete</h2>
     <p>
 The trials are complete.
 The magic has awakened.
@@ -314,13 +293,54 @@ for within the castle’s walls,
 light stirs, laughter echoes,
 and a hidden delight awaits its rightful witch
     </p>
+    <button onclick="birthday()">Ascend</button>
   </div>`);
+}
+
+function birthday(){
+  render(`
+  <div class="parchment" style="text-align:center">
+    <h2>🪄 Happy Birthday, Chaitra 🪄</h2>
+    <p>
+You were never just part of the magic —
+you were the reason it existed.
+    </p>
+  </div>`);
+  launchConfetti();
+}
+
+/* ===== CONFETTI ===== */
+function launchConfetti(){
+  for(let i=0;i<140;i++){
+    const c=document.createElement("div");
+    c.style.position="fixed";
+    c.style.left=Math.random()*100+"vw";
+    c.style.top="-10px";
+    c.style.width="8px";
+    c.style.height="14px";
+    c.style.background=`hsl(${Math.random()*360},80%,60%)`;
+    c.style.opacity=.9;
+    c.style.transform=`rotate(${Math.random()*360}deg)`;
+    c.style.borderRadius="2px";
+    c.style.zIndex=9999;
+    c.style.transition="transform 3s linear, top 3s linear";
+    document.body.appendChild(c);
+
+    setTimeout(()=>{
+      c.style.top="110vh";
+      c.style.transform+=" rotate(720deg)";
+    },50);
+
+    setTimeout(()=>c.remove(),3200);
+  }
 }
 
 intro();
 </script>
 </body>
 </html>
+
+
 
 
 
