@@ -53,17 +53,6 @@ body::before{
   z-index:2;
 }
 
-.parchment::after{
-  content:"";
-  position:absolute;
-  inset:-8px;
-  border-radius:26px;
-  background:linear-gradient(90deg,#7b5cff,#ffb347,#7b5cff);
-  opacity:.25;
-  filter:blur(18px);
-  z-index:-1;
-}
-
 @keyframes fadeIn{
   from{opacity:0;transform:translateY(18px) scale(.96)}
   to{opacity:1;transform:translateY(0) scale(1)}
@@ -140,22 +129,38 @@ h2{margin-top:0}
 
 <script>
 /* ===== AUDIO (ANDROID SAFE) ===== */
-const introMusic=new Audio("intro.mp3");
-const trialMusic=new Audio("trial.mp3");
-const finaleMusic=new Audio("finale.mp3");
-[introMusic,trialMusic,finaleMusic].forEach(m=>{m.loop=true;m.volume=.6});
+const introMusic = new Audio("intro.mp3");
+const trialMusic = new Audio("trial.mp3");
+const finaleMusic = new Audio("finale.mp3");
 
-introMusic.muted=true;
-introMusic.play().catch(()=>{});
-
-document.addEventListener("click",()=>introMusic.muted=false,{once:true});
+introMusic.loop = true;
+trialMusic.loop = true;
+finaleMusic.loop = true;
 
 function stopAll(){
-  [introMusic,trialMusic,finaleMusic].forEach(m=>{m.pause();m.currentTime=0});
+  [introMusic,trialMusic,finaleMusic].forEach(m=>{
+    m.pause();
+    m.currentTime = 0;
+  });
 }
-function playIntro(){stopAll();introMusic.play()}
-function playTrial(){stopAll();trialMusic.play()}
-function playFinale(){stopAll();finaleMusic.play()}
+
+function playIntro(){
+  stopAll();
+  introMusic.volume = 0.6;
+  introMusic.play();
+}
+
+function playTrial(){
+  stopAll();
+  trialMusic.volume = 0.6;
+  trialMusic.play();
+}
+
+function playFinale(){
+  stopAll();
+  finaleMusic.volume = 0.7;
+  finaleMusic.play();
+}
 
 /* ===== STORY ===== */
 const trials=[
@@ -206,68 +211,82 @@ A vessel built for journeys past,
 Holds what memory holds fast.`}
 ];
 
-let i=-1,danger=1;
+let i=-1, danger=1;
 
-function render(h){document.getElementById("app").innerHTML=h}
+function render(h){ document.getElementById("app").innerHTML = h; }
 
 function intro(){
-render(`<div class="parchment">
-<h2>The Six Trials of Chaitra</h2>
-<p><em>The castle whispers your name…</em></p>
-<button onclick="playIntro();instructions()">Begin</button>
+render(`
+<div class="parchment">
+  <h2>The Six Trials of Chaitra</h2>
+  <p><em>The castle whispers your name…</em></p>
+  <button onclick="playIntro();instructions()">Begin</button>
 </div>`);
 }
 
 function instructions(){
-render(`<div class="parchment">
-<p>Lord Voldemort hunts your brother.
+render(`
+<div class="parchment">
+  <p>Lord Voldemort hunts your brother.
 Each truth you uncover weakens him.</p>
-<button onclick="start()">I Understand</button>
+  <button onclick="start()">I Understand</button>
 </div>`);
 }
 
-function start(){i=0;danger=1;playTrial();show()}
+function start(){
+  i=0;
+  danger=1;
+  playTrial();
+  show();
+}
 
 function show(){
-const t=trials[i];danger++;
-render(`<div class="stage">
-<div class="hero"></div>
-<div class="voldemort ${danger>2?'close':''}"></div>
-<div class="parchment">
-<span class="speaker ${t.cls}">${t.speaker}</span>
-<h2>${t.title}</h2>
-<p>${t.text}</p>
-<input id="ans" placeholder="Speak the place…">
-<br><br>
-<button onclick="check()">Cast Spell</button>
-</div></div>`);
+const t=trials[i];
+danger++;
+render(`
+<div class="stage">
+  <div class="hero"></div>
+  <div class="voldemort ${danger>2?'close':''}"></div>
+  <div class="parchment">
+    <span class="speaker ${t.cls}">${t.speaker}</span>
+    <h2>${t.title}</h2>
+    <p>${t.text}</p>
+    <input id="ans" placeholder="Speak the place…">
+    <br><br>
+    <button onclick="check()">Cast Spell</button>
+  </div>
+</div>`);
 }
 
 function check(){
 const v=document.getElementById("ans").value.toLowerCase().trim();
 if(v===trials[i].answer){
-danger=Math.max(1,danger-1);
-i<trials.length-1?(i===2?mirror():showNext()):finale();
-}else{danger++;show()}
+  danger=Math.max(1,danger-1);
+  i<trials.length-1 ? (i===2 ? mirror() : next()) : finale();
+}else{
+  danger++;
+  show();
+}
 }
 
 function mirror(){
-render(`<div class="parchment">
-<h2>The Mirror of Memory</h2>
-<p>Not all magic is loud.
+render(`
+<div class="parchment">
+  <h2>The Mirror of Memory</h2>
+  <p>Not all magic is loud.
 Some simply reminds us who we are.</p>
-<button onclick="showNext()">Continue</button>
+  <button onclick="next()">Continue</button>
 </div>`);
 }
 
-function showNext(){i++;show()}
+function next(){ i++; show(); }
 
 function finale(){
-playFinale();
-render(`<div class="parchment">
-<span class="speaker dumbledore">Albus Dumbledore</span>
-<h2>The End of the Hunt</h2>
-<p>Voldemort falls —
+render(`
+<div class="parchment">
+  <span class="speaker dumbledore">Albus Dumbledore</span>
+  <h2>The End of the Hunt</h2>
+  <p>Voldemort falls —
 not to power,
 but to love he never understood.
 
@@ -277,12 +296,32 @@ Where warmth gathers,
 candles wait,
 and sweetness marks victory —
 your castle awaits.</p>
+  <button onclick="celebration()">Proceed</button>
 </div>`);
+}
+
+function celebration(){
+  playFinale();
+  render(`
+  <div class="parchment">
+    <h2>✨ The Castle Awaits ✨</h2>
+    <p>
+The trials are complete.
+The magic has awakened.
+
+Leave the shadows below and ascend once more—
+for within the castle’s walls,
+light stirs, laughter echoes,
+and a hidden delight awaits its rightful witch
+    </p>
+  </div>`);
 }
 
 intro();
 </script>
 </body>
 </html>
+
+
 
 
