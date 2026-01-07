@@ -53,6 +53,17 @@ body::before{
   z-index:2;
 }
 
+.parchment::after{
+  content:"";
+  position:absolute;
+  inset:-10px;
+  border-radius:26px;
+  background:linear-gradient(90deg,#7b5cff,#ffb347,#7b5cff);
+  opacity:.25;
+  filter:blur(20px);
+  z-index:-1;
+}
+
 @keyframes fadeIn{
   from{opacity:0;transform:translateY(18px) scale(.96)}
   to{opacity:1;transform:translateY(0) scale(1)}
@@ -126,7 +137,7 @@ h2{margin-top:0}
 
 <body>
 
-<!-- ✅ WORKING AUDIO (DO NOT STYLE / DO NOT MOVE) -->
+<!-- ✅ AUDIO (THIS IS WHY IT WORKS NOW) -->
 <audio id="bgm" src="trial.mp3" loop></audio>
 
 <div id="app"></div>
@@ -182,7 +193,7 @@ A vessel built for journeys past,
 Holds what memory holds fast.`}
 ];
 
-let i=-1, danger=1;
+let i=-1,danger=1;
 function render(h){document.getElementById("app").innerHTML=h}
 
 function intro(){
@@ -205,10 +216,10 @@ Dark magic stirs.
 Lord Voldemort hunts your brother —
 and you alone have been chosen to protect him.
 
-Each riddle will lead you to a real place in this home.
+Each riddle leads to a real place in this home.
 Go there.
 Find what awaits you.
-Then return and continue the journey.
+Then return and continue.
 
 Trust your memories.
 Trust your magic.
@@ -261,26 +272,6 @@ render(`
 <span class="speaker dumbledore">Albus Dumbledore</span>
 <h2>The End of the Hunt</h2>
 <p>
-Voldemort falls —
-not to power,
-but to love he never understood.
-
-Your brother is safe.
-
-Where warmth gathers,
-candles wait,
-and sweetness marks victory —
-your castle awaits.
-</p>
-<button onclick="ascend()">Cast the Final Spell</button>
-</div>`);
-}
-
-function ascend(){
-render(`
-<div class="parchment">
-<h2>The Trials Are Complete</h2>
-<p>
 The trials are complete.
 The magic has awakened.
 
@@ -304,7 +295,7 @@ launchConfetti();
 }
 
 function launchConfetti(){
-for(let i=0;i<140;i++){
+for(let i=0;i<160;i++){
 const c=document.createElement("div");
 c.style.position="fixed";
 c.style.left=Math.random()*100+"vw";
@@ -326,6 +317,7 @@ intro();
 </script>
 </body>
 </html>
+
 
 
 
