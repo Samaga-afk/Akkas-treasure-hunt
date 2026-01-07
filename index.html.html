@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Six Trials of Chaitra</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Georgia, serif;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(120,90,255,.18), transparent 45%),
+    radial-gradient(circle at 80% 20%, rgba(255,140,140,.15), transparent 45%),
+    radial-gradient(circle at center, #0b1026, #000);
+  color: #f5e6b8;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+body::before {
+  content:"";
+  position:fixed;
+  inset:0;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,.12) 1px, transparent 1px);
+  background-size:120px 120px;
+  animation: drift 45s linear infinite;
+  pointer-events:none;
+}
+
+@keyframes drift {
+  from { transform: translateY(0); }
+  to { transform: translateY(-120px); }
+}
+
+#app {
+  width: 100%;
+  max-width: 1050px;
+  padding: 24px;
+}
+
+.stage {
+  position: relative;
+  min-height: 480px;
+}
+
+.parchment {
+  background:
+    linear-gradient(#fff7de, #f0ddb0),
+    repeating-linear-gradient(
+      45deg,
+      rgba(0,0,0,.02),
+      rgba(0,0,0,.02) 2px,
+      transparent 2px,
+      transparent 6px
+    );
+  color: #2c1b10;
+  padding: 34px;
+  border-radius: 22px;
+  box-shadow:
+    0 0 60px rgba(120,90,255,.35),
+    inset 0 0 40px rgba(255,255,255,.4);
+  animation: fadeIn .9s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.parchment::after {
+  content:"";
+  position:absolute;
+  inset:-6px;
+  border-radius:24px;
+  background:linear-gradient(90deg,#7b5cff,#ffb347,#7b5cff);
+  opacity:.25;
+  filter:blur(14px);
+  z-index:-1;
+}
+
+@keyframes fadeIn {
+  from { opacity:0; transform:translateY(20px) scale(.97); }
+  to { opacity:1; transform:translateY(0) scale(1); }
+}
+
+button {
+  background: linear-gradient(135deg, #7b5cff, #9b7cff);
+  border: none;
+  color: white;
+  padding: 14px 32px;
+  font-size: 17px;
+  border-radius: 14px;
+  cursor: pointer;
+  box-shadow: 0 0 28px rgba(123,92,255,.75);
+  animation: pulse 2.6s infinite;
+}
+
+@keyframes pulse {
+  0%,100% { box-shadow:0 0 18px rgba(123,92,255,.5); }
+  50% { box-shadow:0 0 36px rgba(123,92,255,1); }
+}
+
+input {
+  width:100%;
+  padding:14px;
+  margin-top:14px;
+  font-size:16px;
+  border-radius:10px;
+  border:none;
+}
+
+.speaker {
+  display:inline-block;
+  padding:6px 18px;
+  border-radius:999px;
+  margin-bottom:14px;
+  font-size:13px;
+  font-weight:bold;
+}
+
+.castle{background:#6b5cff;color:#fff;}
+.hermione{background:#d4af37;color:#000;}
+.harry{background:#b22222;color:#fff;}
+.mcgonagall{background:#2e8b57;color:#fff;}
+.molly{background:#cd853f;color:#fff;}
+.dumbledore{background:#483d8b;color:#fff;}
+
+.hero-silhouette {
+  position:absolute;
+  left:-120px;
+  bottom:0;
+  width:240px;
+  height:400px;
+  background:linear-gradient(to top, rgba(80,80,160,.7), rgba(0,0,0,.9));
+  clip-path: polygon(50% 0%,62% 18%,72% 45%,66% 100%,34% 100%,28% 45%,38% 18%);
+  opacity:.5;
+}
+
+.voldemort-silhouette {
+  position:absolute;
+  right:-150px;
+  bottom:0;
+  width:290px;
+  height:450px;
+  background:linear-gradient(to top, rgba(160,0,0,.8), rgba(0,0,0,.95));
+  clip-path: polygon(50% 0%,65% 12%,78% 38%,88% 75%,72% 100%,28% 100%,12% 75%,22% 38%,35% 12%);
+  opacity:.4;
+  transition:right 1.2s ease, opacity 1.2s ease;
+}
+
+.voldemort-close { right:20px; opacity:.75; }
+
+h2 { margin-top:0; }
+p { line-height:1.7; white-space:pre-line; }
+</style>
+</head>
+
+<body>
+<div id="app"></div>
+
+<script>
+/* ===== MUSIC (SAME FOLDER) ===== */
+const introMusic = new Audio("intro.mp3");
+const trialMusic = new Audio("trial.mp3");
+const finaleMusic = new Audio("finale.mp3");
+
+introMusic.loop = true;
+trialMusic.loop = true;
+
+function stopMusic(){
+  introMusic.pause(); introMusic.currentTime = 0;
+  trialMusic.pause(); trialMusic.currentTime = 0;
+  finaleMusic.pause(); finaleMusic.currentTime = 0;
+}
+
+/* ===== TRIAL DATA ===== */
+const trials = [
+  {title:"The Whispering Hall",speaker:"The Castle",cls:"castle",answer:"hall",
+text:`Soft paws guard what words cannot say,
+A loyal heart that chose to stay.
+Where magic first lit up your eyes,
+And a boy with a scar would always rise.
+Voices echoed, spells took flight,
+Find the place where screens shone bright.`},
+
+  {title:"Threads You Cannot See",speaker:"Hermione Granger",cls:"hermione",answer:"computer room",
+text:`A world unseen, yet always near,
+Where voices travel far and clear.
+No spell would work, no tale would load,
+Without the threads where signals flowed.
+Keys tap fast, bright screens awake,
+Seek the room you cannot forsake.`},
+
+  {title:"The Quiet Star",speaker:"Harry Potter",cls:"harry",answer:"my room",
+text:`When strength was low and nights were long,
+You spoke to light to stay strong.
+A silent star that heard your plea,
+When rest was all you wished to be.
+Find the place where hope once lay,
+Where whispers reached the night away.`},
+
+  {title:"Moving Shadows",speaker:"Professor McGonagall",cls:"mcgonagall",answer:"master bedroom",
+text:`Not a book, yet stories played,
+Upon a wall where shadows stayed.
+A room of scenes, of light and sound,
+Where worlds appeared without a bound.
+Seek where magic filled the air,
+A theatre formed beyond repair.`},
+
+  {title:"A Mother’s Magic",speaker:"Molly Weasley",cls:"molly",answer:"kitchen",
+text:`Forged not by spell, yet bound by care,
+A love that follows everywhere.
+Where warmth creates and hands provide,
+Seek what shines where meals reside.`},
+
+  {title:"What Darkness Could Never Take",speaker:"Albus Dumbledore",cls:"dumbledore",answer:"basement",
+text:`Beneath where footsteps fade from sound,
+Where wheels sleep still on hidden ground.
+Not rooms above, nor doors in sight,
+But lower still — away from light.
+A vessel built for journeys past,
+Holds what memory holds fast.`}
+];
+
+let index=-1, danger=0;
+
+function render(h){ document.getElementById("app").innerHTML=h; }
+
+function intro(){
+  stopMusic();
+  render(`
+  <div class="parchment">
+    <h2>The Six Trials of Chaitra</h2>
+    <p><em>The castle whispers your name…</em></p>
+    <button onclick="instructions()">Begin</button>
+  </div>`);
+}
+
+function instructions(){
+  stopMusic();
+  introMusic.play();
+  render(`
+  <div class="parchment">
+    <h2>The Briefing</h2>
+    <p>Lord Voldemort hunts your brother.
+Each truth you uncover weakens him.</p>
+    <button onclick="start()">I Understand</button>
+  </div>`);
+}
+
+function start(){
+  index=0; danger=1;
+  stopMusic();
+  trialMusic.play();
+  show();
+}
+
+function show(){
+  const t=trials[index]; danger++;
+  render(`
+  <div class="stage">
+    <div class="hero-silhouette"></div>
+    <div class="voldemort-silhouette ${danger>2?'voldemort-close':''}"></div>
+    <div class="parchment">
+      <span class="speaker ${t.cls}">${t.speaker}</span>
+      <h2>${t.title}</h2>
+      <p>${t.text}</p>
+      <input id="answer" placeholder="Speak the place…" />
+      <br><br>
+      <button onclick="check()">Cast Spell</button>
+    </div>
+  </div>`);
+}
+
+function check(){
+  const v=document.getElementById("answer").value.toLowerCase().trim();
+  if(v===trials[index].answer){
+    danger=Math.max(1,danger-1);
+    index===2 ? mirror() : next();
+  } else {
+    danger++;
+    show();
+  }
+}
+
+function mirror(){
+  render(`
+  <div class="parchment">
+    <h2>The Mirror of Memory</h2>
+    <p>Not all magic is loud.
+Some simply reminds us who we are.</p>
+    <button onclick="next()">Continue</button>
+  </div>`);
+}
+
+function next(){
+  index++;
+  index<trials.length ? show() : finale();
+}
+
+function finale(){
+  stopMusic();
+  finaleMusic.play();
+  render(`
+  <div class="parchment">
+    <span class="speaker dumbledore">Albus Dumbledore</span>
+    <h2>The End of the Hunt</h2>
+    <p>Voldemort falls —
+not to power,
+but to love he never understood.
+
+Your brother is safe.
+
+One final truth remains…
+
+Where warmth gathers,
+candles wait,
+and sweetness marks victory —
+your castle awaits.</p>
+    <button onclick="end()">Finish</button>
+  </div>`);
+}
+
+function end(){
+  render(`
+  <div class="parchment">
+    <h2>🪄 Happy Birthday, Chaitra 🪄</h2>
+    <p>You were always the magic.</p>
+  </div>`);
+}
+
+intro();
+</script>
+</body>
+</html>
