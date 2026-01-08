@@ -7,7 +7,6 @@
 
 <style>
 *{box-sizing:border-box}
-
 body{
   margin:0;
   font-family:Georgia,serif;
@@ -22,7 +21,6 @@ body{
     radial-gradient(circle at center,#0b1026,#000);
   overflow:hidden;
 }
-
 body::before{
   content:"";
   position:fixed;
@@ -32,16 +30,9 @@ body::before{
   animation:stars 40s linear infinite;
   pointer-events:none;
 }
-
-@keyframes stars{
-  from{transform:translateY(0)}
-  to{transform:translateY(-120px)}
-}
-
+@keyframes stars{from{transform:translateY(0)}to{transform:translateY(-120px)}}
 #app{width:100%;max-width:1100px;padding:22px}
-
 .stage{position:relative;min-height:520px}
-
 .parchment{
   background:linear-gradient(#fff7de,#f0ddb0);
   color:#2c1b10;
@@ -52,7 +43,6 @@ body::before{
   position:relative;
   z-index:2;
 }
-
 .parchment::after{
   content:"";
   position:absolute;
@@ -63,12 +53,10 @@ body::before{
   filter:blur(20px);
   z-index:-1;
 }
-
 @keyframes fadeIn{
   from{opacity:0;transform:translateY(18px) scale(.96)}
   to{opacity:1;transform:translateY(0) scale(1)}
 }
-
 button{
   background:linear-gradient(135deg,#7b5cff,#9b7cff);
   border:none;
@@ -79,7 +67,6 @@ button{
   cursor:pointer;
   box-shadow:0 0 30px rgba(123,92,255,.8);
 }
-
 input{
   width:100%;
   padding:14px;
@@ -88,7 +75,6 @@ input{
   border-radius:10px;
   border:none;
 }
-
 .speaker{
   display:inline-block;
   padding:6px 18px;
@@ -97,14 +83,12 @@ input{
   margin-bottom:14px;
   font-weight:bold;
 }
-
 .castle{background:#6b5cff;color:#fff}
 .hermione{background:#d4af37;color:#000}
 .harry{background:#b22222;color:#fff}
 .mcgonagall{background:#2e8b57;color:#fff}
 .molly{background:#cd853f;color:#fff}
 .dumbledore{background:#483d8b;color:#fff}
-
 .hero{
   position:absolute;
   left:-130px;
@@ -115,7 +99,6 @@ input{
   clip-path:polygon(50% 0%,63% 18%,72% 45%,66% 100%,34% 100%,28% 45%,37% 18%);
   opacity:.5;
 }
-
 .voldemort{
   position:absolute;
   right:-160px;
@@ -127,9 +110,7 @@ input{
   opacity:.45;
   transition:right 1.2s ease,opacity 1.2s ease;
 }
-
 .voldemort.close{right:20px;opacity:.75}
-
 p{line-height:1.7;white-space:pre-line}
 h2{margin-top:0}
 </style>
@@ -137,13 +118,12 @@ h2{margin-top:0}
 
 <body>
 
-<!-- ✅ AUDIO (THIS IS WHY IT WORKS NOW) -->
 <audio id="bgm" src="trial.mp3" loop></audio>
 
 <div id="app"></div>
 
 <script>
-const bgm = document.getElementById("bgm");
+const bgm=document.getElementById("bgm");
 
 const trials=[
 {title:"The Whispering Hall",speaker:"The Castle",cls:"castle",answer:"hall",
@@ -210,25 +190,19 @@ render(`
 <div class="parchment">
 <h2>🪄 The Instructions 🪄</h2>
 <p>
-Chaitra,
+Lord Voldemort hunts your brother.
+Each truth you uncover weakens him.
 
-Dark magic stirs.
-Lord Voldemort hunts your brother —
-and you alone have been chosen to protect him.
-
-Each riddle leads to a real place in this home.
-Go there.
+Solve the riddle.
+Go to the real place.
 Find what awaits you.
-Then return and continue.
-
-Trust your memories.
-Trust your magic.
+Return, and continue.
 </p>
-<button onclick="beginTrials()">Begin the First Trial</button>
+<button onclick="start()">Begin the First Trial</button>
 </div>`);
 }
 
-function beginTrials(){i=0;danger=1;show()}
+function start(){i=0;danger=1;show()}
 
 function show(){
 const t=trials[i]; danger++;
@@ -250,8 +224,30 @@ function check(){
 const v=document.getElementById("ans").value.toLowerCase().trim();
 if(v===trials[i].answer){
   danger=Math.max(1,danger-1);
-  i<trials.length-1?(i===2?mirror():next()):finale();
-}else{danger++;show()}
+  interlude();
+}else{
+  danger++;
+  show();
+}
+}
+
+function interlude(){
+render(`
+<div class="parchment">
+<h2>✨ The Spell Holds ✨</h2>
+<p>
+Darkness recoils.
+
+Take a moment.
+Open what you have found.
+Let it sink in.
+</p>
+<button onclick="next()">Continue</button>
+</div>`);
+}
+
+function next(){
+i<trials.length-1?(i===2?mirror():(++i,show())):finale();
 }
 
 function mirror(){
@@ -260,16 +256,13 @@ render(`
 <h2>The Mirror of Memory</h2>
 <p>Not all magic is loud.
 Some simply reminds us who we are.</p>
-<button onclick="next()">Continue</button>
+<button onclick="++i;show()">Continue</button>
 </div>`);
 }
-
-function next(){i++;show()}
 
 function finale(){
 render(`
 <div class="parchment">
-<span class="speaker dumbledore">Albus Dumbledore</span>
 <h2>The End of the Hunt</h2>
 <p>
 The trials are complete.
@@ -291,10 +284,10 @@ render(`
 <p>You were never just part of the magic —
 you were the reason it existed.</p>
 </div>`);
-launchConfetti();
+confetti();
 }
 
-function launchConfetti(){
+function confetti(){
 for(let i=0;i<160;i++){
 const c=document.createElement("div");
 c.style.position="fixed";
@@ -317,6 +310,7 @@ intro();
 </script>
 </body>
 </html>
+
 
 
 
