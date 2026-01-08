@@ -119,58 +119,102 @@ h2{margin-top:0}
 <body>
 
 <audio id="bgm" src="trial.mp3" loop></audio>
-
 <div id="app"></div>
 
 <script>
 const bgm=document.getElementById("bgm");
 
 const trials=[
-{title:"The Whispering Hall",speaker:"The Castle",cls:"castle",answer:"hall",
-text:`Soft paws guard what words cannot say,
+{title:"The Whispering Hall",speaker:"The Castle",cls:"castle",answer:"hall"},
+{title:"Threads You Cannot See",speaker:"Hermione Granger",cls:"hermione",answer:"computer room"},
+{title:"The Quiet Star",speaker:"Harry Potter",cls:"harry",answer:"my room"},
+{title:"Moving Shadows",speaker:"Professor McGonagall",cls:"mcgonagall",answer:"master bedroom"},
+{title:"A Mother’s Magic",speaker:"Molly Weasley",cls:"molly",answer:"kitchen"},
+{title:"What Darkness Could Never Take",speaker:"Albus Dumbledore",cls:"dumbledore",answer:"basement"}
+];
+
+const riddles=[
+`Soft paws guard what words cannot say,
 A loyal heart that chose to stay.
 Where magic first lit up your eyes,
 And a boy with a scar would always rise.
 Voices echoed, spells took flight,
-Find the place where screens shone bright.`},
+Find the place where screens shone bright.`,
 
-{title:"Threads You Cannot See",speaker:"Hermione Granger",cls:"hermione",answer:"computer room",
-text:`A world unseen, yet always near,
+`A world unseen, yet always near,
 Where voices travel far and clear.
 No spell would work, no tale would load,
 Without the threads where signals flowed.
 Keys tap fast, bright screens awake,
-Seek the room you cannot forsake.`},
+Seek the room you cannot forsake.`,
 
-{title:"The Quiet Star",speaker:"Harry Potter",cls:"harry",answer:"my room",
-text:`When strength was low and nights were long,
+`When strength was low and nights were long,
 You spoke to light to stay strong.
 A silent star that heard your plea,
 When rest was all you wished to be.
 Find the place where hope once lay,
-Where whispers reached the night away.`},
+Where whispers reached the night away.`,
 
-{title:"Moving Shadows",speaker:"Professor McGonagall",cls:"mcgonagall",answer:"master bedroom",
-text:`Not a book, yet stories played,
+`Not a book, yet stories played,
 Upon a wall where shadows stayed.
 A room of scenes, of light and sound,
 Where worlds appeared without a bound.
 Seek where magic filled the air,
-A theatre formed beyond repair.`},
+A theatre formed beyond repair.`,
 
-{title:"A Mother’s Magic",speaker:"Molly Weasley",cls:"molly",answer:"kitchen",
-text:`Forged not by spell, yet bound by care,
+`Forged not by spell, yet bound by care,
 A love that follows everywhere.
 Where warmth creates and hands provide,
-Seek what shines where meals reside.`},
+Seek what shines where meals reside.`,
 
-{title:"What Darkness Could Never Take",speaker:"Albus Dumbledore",cls:"dumbledore",answer:"basement",
-text:`Beneath where footsteps fade from sound,
+`Beneath where footsteps fade from sound,
 Where wheels sleep still on hidden ground.
 Not rooms above, nor doors in sight,
 But lower still — away from light.
 A vessel built for journeys past,
-Holds what memory holds fast.`}
+Holds what memory holds fast.`
+];
+
+const intervals=[
+`Darkness falters — not from force, but from something warm and familiar.
+
+This place remembers comfort.
+Small paws. Quiet strength.
+A presence that stayed.
+
+Take a moment, Chaitra.
+What you have found carries gentle magic.`,
+
+`Knowledge hums softly here.
+Curiosity. Screens aglow.
+
+Magic sometimes stands proudly on a desk,
+reminding us of the worlds that shaped us.
+
+Voldemort hesitates.`,
+
+`This place remembers quiet nights.
+Whispers to the stars.
+Hope spoken softly.
+
+Some letters arrive only when the moment is right.`,
+
+`Stories once danced upon these walls.
+Light became worlds.
+
+Voldemort recoils again —
+stories have always frightened him.`,
+
+`Not all magic glows.
+Some is worn close to the heart.
+
+Love like this was never his strength.`,
+
+`Beneath the castle,
+memory waits.
+
+This is not a gift to be rushed.
+Take all the time you need.`
 ];
 
 let i=-1,danger=1;
@@ -190,9 +234,6 @@ render(`
 <div class="parchment">
 <h2>🪄 The Instructions 🪄</h2>
 <p>
-Lord Voldemort hunts your brother.
-Each truth you uncover weakens him.
-
 Solve the riddle.
 Go to the real place.
 Find what awaits you.
@@ -205,15 +246,14 @@ Return, and continue.
 function start(){i=0;danger=1;show()}
 
 function show(){
-const t=trials[i]; danger++;
 render(`
 <div class="stage">
 <div class="hero"></div>
 <div class="voldemort ${danger>2?'close':''}"></div>
 <div class="parchment">
-<span class="speaker ${t.cls}">${t.speaker}</span>
-<h2>${t.title}</h2>
-<p>${t.text}</p>
+<span class="speaker ${trials[i].cls}">${trials[i].speaker}</span>
+<h2>${trials[i].title}</h2>
+<p>${riddles[i]}</p>
 <input id="ans" placeholder="Speak the place…">
 <br><br>
 <button onclick="check()">Cast Spell</button>
@@ -223,47 +263,27 @@ render(`
 function check(){
 const v=document.getElementById("ans").value.toLowerCase().trim();
 if(v===trials[i].answer){
-  danger=Math.max(1,danger-1);
-  interlude();
+  render(`
+  <div class="parchment">
+  <h2>✨ The Spell Holds ✨</h2>
+  <p>${intervals[i]}</p>
+  <button onclick="next()">Continue</button>
+  </div>`);
 }else{
   danger++;
   show();
 }
 }
 
-function interlude(){
-render(`
-<div class="parchment">
-<h2>✨ The Spell Holds ✨</h2>
-<p>
-Darkness recoils.
-
-Take a moment.
-Open what you have found.
-Let it sink in.
-</p>
-<button onclick="next()">Continue</button>
-</div>`);
-}
-
 function next(){
-i<trials.length-1?(i===2?mirror():(++i,show())):finale();
-}
-
-function mirror(){
-render(`
-<div class="parchment">
-<h2>The Mirror of Memory</h2>
-<p>Not all magic is loud.
-Some simply reminds us who we are.</p>
-<button onclick="++i;show()">Continue</button>
-</div>`);
+i++;
+i<trials.length?show():finale();
 }
 
 function finale(){
 render(`
 <div class="parchment">
-<h2>The End of the Hunt</h2>
+<h2>The Trials Are Complete</h2>
 <p>
 The trials are complete.
 The magic has awakened.
@@ -281,14 +301,13 @@ function birthday(){
 render(`
 <div class="parchment" style="text-align:center">
 <h2>🪄 Happy Birthday, Chaitra 🪄</h2>
-<p>You were never just part of the magic —
-you were the reason it existed.</p>
+<p>You were always the magic.</p>
 </div>`);
 confetti();
 }
 
 function confetti(){
-for(let i=0;i<160;i++){
+for(let i=0;i<150;i++){
 const c=document.createElement("div");
 c.style.position="fixed";
 c.style.left=Math.random()*100+"vw";
@@ -310,6 +329,8 @@ intro();
 </script>
 </body>
 </html>
+
+
 
 
 
